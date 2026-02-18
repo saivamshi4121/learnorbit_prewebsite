@@ -147,21 +147,21 @@ export default function WaitlistWizard() {
 
             try {
                 const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://learnorbit-backend.onrender.com";
+                // Quick check - optimistically fast
                 const response = await axios.post(`${apiUrl}/api/marketing/check-email`, { email: data.email });
 
                 if (response.data.exists) {
                     setSubmittedEmail(data.email);
                     setModalType("exists");
                     setIsModalOpen(true);
-                    triggerConfetti(); // 🎉 Celebration even if already joined!
+                    triggerConfetti();
                     setLoading(false);
-                    return;
+                    return; // Stop here if exists
                 }
             } catch (err) {
-                console.error("Email check failed", err);
-                setError("Unable to verify email. Please try again.");
-                setLoading(false);
-                return;
+                // If the check fails (e.g. network error), we probably shouldn't block the user 
+                // from trying to fill the rest. We can just let them proceed and catch it at the end.
+                console.warn("Email check skipped due to error", err);
             }
 
             setLoading(false);
