@@ -37,29 +37,65 @@ app.get('/api/health', (req, res) => {
 
 // Nodemailer Transporter
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT) || 465,
+    secure: true, // Use SSL for port 465
     pool: true, // Reuse connections
+    maxConnections: 3,
+    maxMessages: 100,
+    rateDelta: 1000,
+    rateLimit: 3,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
     },
     tls: {
         rejectUnauthorized: false // Helps in some restricted environments
-    }
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000,
+    socketTimeout: 10000
 });
+
+// Verify transporter connection on startup
+setTimeout(() => {
+    transporter.verify((error, success) => {
+        if (error) {
+            console.error('SMTP Connection Error:', error.message);
+            console.error('Check your EMAIL credentials and app password');
+        } else {
+            console.log('SMTP Server is ready to take our messages');
+        }
+    });
+}, 1000);
 
 // Helper to send email
 async function sendEmail(to, subject, html) {
-    try {
-        await transporter.sendMail({
-            from: process.env.SMTP_USER,
-            to,
-            subject,
-            html
-        });
-        console.log(`Email sent to ${to}`);
-    } catch (error) {
-        console.error(`Error sending email to ${to}:`, error);
+    const maxRetries = 3;
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+        try {
+            await transporter.sendMail({
+                from: `"LearnOrbit" <${process.env.SMTP_USER}>`,
+                to,
+                subject,
+                html
+            });
+            console.log(`✓ Email sent to ${to}`);
+            return;
+        } catch (error) {
+            attempt++;
+            console.error(`Email attempt ${attempt} failed for ${to}:`, error.message);
+
+            if (attempt >= maxRetries) {
+                console.error(`Failed to send email to ${to} after ${maxRetries} attempts`);
+                return;
+            }
+
+            // Wait before retrying (exponential backoff)
+            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+        }
     }
 }
 
