@@ -41,34 +41,36 @@ const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: smtpPort,
     secure: smtpPort === 465, // true for 465, false for 587
-    pool: true, // Reuse connections
-    maxConnections: 3,
-    maxMessages: 100,
-    rateDelta: 1000,
-    rateLimit: 3,
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
     },
     tls: {
-        rejectUnauthorized: false // Helps in some restricted environments
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2'
     },
-    connectionTimeout: 10000, // 10 seconds
-    greetingTimeout: 10000,
-    socketTimeout: 10000
+    connectionTimeout: 30000, // 30 seconds
+    greetingTimeout: 30000,
+    socketTimeout: 30000
 });
 
 // Verify transporter connection on startup
 setTimeout(() => {
+    console.log(`Checking SMTP connection to ${process.env.SMTP_HOST || 'smtp.gmail.com'}:${smtpPort}...`);
     transporter.verify((error, success) => {
         if (error) {
-            console.error('SMTP Connection Error:', error.message);
-            console.error('Check your EMAIL credentials and app password');
+            console.error('SMTP Connection Error:', error);
+            if (error.code === 'ETIMEDOUT') {
+                console.error('TIMEOUT: The server could not connect to the SMTP host. Check if port 465/587 is blocked.');
+            } else if (error.code === 'EAUTH') {
+                console.error('AUTH FAILED: The email or app password is incorrect.');
+            }
+            console.error('Check your EMAIL credentials and app password carefully.');
         } else {
-            console.log('SMTP Server is ready to take our messages');
+            console.log('✓ SMTP Server is ready to take our messages');
         }
     });
-}, 1000);
+}, 2000);
 
 // Helper to send email
 async function sendEmail(to, subject, html) {
