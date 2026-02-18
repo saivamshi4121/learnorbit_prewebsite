@@ -35,42 +35,42 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', uptime: process.uptime() });
 });
 
-// Nodemailer Transporter
-const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
+// Nodemailer Transporter Configuration
+const smtpUser = process.env.SMTP_USER;
+const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, ''); // Auto-trim spaces
+
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: smtpPort,
-    secure: smtpPort === 465, // true for 465, false for 587
+    service: 'gmail',
     auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: smtpUser,
+        pass: smtpPass
     },
     tls: {
-        rejectUnauthorized: false,
-        minVersion: 'TLSv1.2'
-    },
-    connectionTimeout: 30000, // 30 seconds
-    greetingTimeout: 30000,
-    socketTimeout: 30000
+        rejectUnauthorized: false
+    }
 });
 
-// Verify transporter connection on startup
+// Verify SMTP connection on startup with improved logging
 setTimeout(() => {
-    console.log(`Checking SMTP connection to ${process.env.SMTP_HOST || 'smtp.gmail.com'}:${smtpPort}...`);
+    console.log('Attempting to connect to SMTP server...');
     transporter.verify((error, success) => {
         if (error) {
-            console.error('SMTP Connection Error:', error);
+            console.error('SMTP Error Details:', {
+                code: error.code,
+                command: error.command,
+                message: error.message
+            });
+
             if (error.code === 'ETIMEDOUT') {
-                console.error('TIMEOUT: The server could not connect to the SMTP host. Check if port 465/587 is blocked.');
+                console.error('>>> CONNECTION TIMEOUT: Render is likely blocking port 465/587. Consider using Resend.com.');
             } else if (error.code === 'EAUTH') {
-                console.error('AUTH FAILED: The email or app password is incorrect.');
+                console.error('>>> AUTHENTICATION FAILED: Check if App Password is correct and has NO SPACES.');
             }
-            console.error('Check your EMAIL credentials and app password carefully.');
         } else {
-            console.log('✓ SMTP Server is ready to take our messages');
+            console.log('✓ SMTP Connection Verified: Ready to send emails.');
         }
     });
-}, 2000);
+}, 5000);
 
 // Helper to send email
 async function sendEmail(to, subject, html) {
