@@ -16,9 +16,9 @@ Follow these steps to deploy your LearnOrbit application to production.
         *   `SUPABASE_URL`: Your Supabase project URL.
         *   `SUPABASE_KEY`: Your Supabase service role key (or anon key if using client-side auth, but backend usually needs service role).
         *   `SMTP_HOST`: (e.g., `smtp.gmail.com`)
-        *   `SMTP_PORT`: (e.g., `587`)
+        *   `SMTP_PORT`: `587` (Recommended for Render - port 465 may be blocked)
         *   `SMTP_USER`: Your email address.
-        *   `SMTP_PASS`: Your app password.
+        *   `SMTP_PASS`: Your Gmail App Password (NOT your regular password - see below).
         *   `ADMIN_EMAIL`: Email to receive notifications.
         *   `PORT`: `10000` (Render sets this automatically, but your code uses `process.env.PORT` so it's fine).
 

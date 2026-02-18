@@ -36,10 +36,11 @@ app.get('/api/health', (req, res) => {
 });
 
 // Nodemailer Transporter
+const smtpPort = parseInt(process.env.SMTP_PORT) || 587;
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT) || 465,
-    secure: true, // Use SSL for port 465
+    port: smtpPort,
+    secure: smtpPort === 465, // true for 465, false for 587
     pool: true, // Reuse connections
     maxConnections: 3,
     maxMessages: 100,
