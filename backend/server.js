@@ -40,13 +40,16 @@ const smtpUser = process.env.SMTP_USER;
 const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, ''); // Auto-trim spaces
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // Must be false for port 587
     auth: {
         user: smtpUser,
         pass: smtpPass
     },
     tls: {
-        rejectUnauthorized: false
+        rejectUnauthorized: false,
+        minVersion: 'TLSv1.2'
     }
 });
 
