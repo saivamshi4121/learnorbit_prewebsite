@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
 // ... (existing imports)
 const cors = require('cors');
@@ -23,87 +23,42 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
+console.log('Supabase Client Initialized');
 
-console.log('Supabase Client Initialized with URL:', supabaseUrl);
+// Resend Configuration
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('LearnOrbit Backend API is running with Supabase.');
+    res.send('LearnOrbit Backend API is running with Resend.');
 });
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', uptime: process.uptime() });
 });
 
-// Nodemailer Transporter Configuration
-const smtpUser = process.env.SMTP_USER;
-const smtpPass = (process.env.SMTP_PASS || '').replace(/\s+/g, ''); // Auto-trim spaces
-
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false, // Must be false for port 587
-    auth: {
-        user: smtpUser,
-        pass: smtpPass
-    },
-    tls: {
-        rejectUnauthorized: false,
-        minVersion: 'TLSv1.2'
-    }
-});
-
-// Verify SMTP connection on startup with improved logging
-setTimeout(() => {
-    console.log('Attempting to connect to SMTP server...');
-    transporter.verify((error, success) => {
-        if (error) {
-            console.error('SMTP Error Details:', {
-                code: error.code,
-                command: error.command,
-                message: error.message
-            });
-
-            if (error.code === 'ETIMEDOUT') {
-                console.error('>>> CONNECTION TIMEOUT: Render is likely blocking port 465/587. Consider using Resend.com.');
-            } else if (error.code === 'EAUTH') {
-                console.error('>>> AUTHENTICATION FAILED: Check if App Password is correct and has NO SPACES.');
-            }
-        } else {
-            console.log('✓ SMTP Connection Verified: Ready to send emails.');
-        }
-    });
-}, 5000);
-
-// Helper to send email
+// Helper to send email using Resend API
 async function sendEmail(to, subject, html) {
-    const maxRetries = 3;
-    let attempt = 0;
+    try {
+        const { data, error } = await resend.emails.send({
+            from: 'LearnOrbit <onboarding@resend.dev>', // Free tier default
+            to: [to],
+            subject: subject,
+            html: html,
+        });
 
-    while (attempt < maxRetries) {
-        try {
-            await transporter.sendMail({
-                from: `"LearnOrbit" <${process.env.SMTP_USER}>`,
-                to,
-                subject,
-                html
-            });
-            console.log(`✓ Email sent to ${to}`);
+        if (error) {
+            console.error(`✗ Resend Error for ${to}:`, error.message);
             return;
-        } catch (error) {
-            attempt++;
-            console.error(`Email attempt ${attempt} failed for ${to}:`, error.message);
-
-            if (attempt >= maxRetries) {
-                console.error(`Failed to send email to ${to} after ${maxRetries} attempts`);
-                return;
-            }
-
-            // Wait before retrying (exponential backoff)
-            await new Promise(resolve => setTimeout(resolve, attempt * 1000));
         }
+
+        console.log(`✓ Email sent via Resend to ${to} (ID: ${data.id})`);
+    } catch (err) {
+        console.error(`✗ Fatal Email Error for ${to}:`, err.message);
     }
 }
+
+
 
 // Check if email exists
 app.post('/api/marketing/check-email', async (req, res) => {
