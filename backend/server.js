@@ -41,7 +41,7 @@ app.get('/api/health', (req, res) => {
 async function sendEmail(to, subject, html) {
     try {
         const { data, error } = await resend.emails.send({
-            from: 'LearnOrbit <onboarding@resend.dev>', // Free tier default
+            from: 'LearnOrbit <no-reply@learnorbit.stackhaus.dev>',
             to: [to],
             subject: subject,
             html: html,
