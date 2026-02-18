@@ -1,0 +1,165 @@
+@import "tailwindcss";
+@plugin "tailwindcss-animate";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+:root {
+  /* User Defined Palette STRICT */
+  --primary-blue: #2563EB;
+  --secondary-slate: #0F172A;
+  --accent-green: #22C55E;
+  --background-gray: #F8FAFC;
+  --card-white: #FFFFFF;
+  --danger-red: #EF4444;
+
+  /* Semantic Mapping */
+  --background: var(--background-gray);
+  --foreground: var(--secondary-slate);
+
+  --card: var(--card-white);
+  --card-foreground: var(--secondary-slate);
+
+  --popover: var(--card-white);
+  --popover-foreground: var(--secondary-slate);
+
+  --primary: var(--primary-blue);
+  --primary-foreground: #FFFFFF;
+
+  --secondary: var(--background-gray);
+  --secondary-foreground: var(--secondary-slate);
+
+  --muted: var(--background-gray);
+  /* Muted foreground: Secondary Slate with 60% opacity */
+  --muted-foreground: rgba(15, 23, 42, 0.6);
+
+  /* Accent: Secondary Slate with 5% opacity for hovers */
+  --accent: rgba(15, 23, 42, 0.05);
+  --accent-foreground: var(--primary-blue);
+
+  --success: var(--accent-green);
+
+  --destructive: var(--danger-red);
+  --destructive-foreground: #FFFFFF;
+
+  /* Border: Secondary Slate with 15% opacity */
+  --border: rgba(15, 23, 42, 0.15);
+  --input: rgba(15, 23, 42, 0.15);
+  --ring: var(--primary-blue);
+
+  --radius: 0.5rem;
+
+  --chart-1: var(--primary-blue);
+  --chart-2: var(--accent-green);
+  --chart-3: var(--danger-red);
+  --chart-4: var(--secondary-slate);
+  --chart-5: var(--primary-blue);
+
+  --sidebar: var(--background-gray);
+  --sidebar-foreground: var(--secondary-slate);
+  --sidebar-primary: var(--primary-blue);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FFFFFF;
+  --sidebar-accent-foreground: var(--primary-blue);
+  --sidebar-border: rgba(15, 23, 42, 0.1);
+  --sidebar-ring: var(--primary-blue);
+}
+
+.dark {
+  /* Mapping to allow Dark Mode but respecting strict colors where reasonable, 
+     mostly inverting Foreground/Background or using dark slate as bg */
+
+  --background: var(--secondary-slate);
+  --foreground: var(--background-gray);
+
+  --card: #1e293b;
+  /* Fallback for dark card if needed, or strictly use secondary-slate? 
+                      Strict adherence would imply using #0F172A for bg and white for text.
+                   */
+  --card-foreground: var(--background-gray);
+  --popover: var(--secondary-slate);
+  --popover-foreground: var(--background-gray);
+
+  --primary: var(--primary-blue);
+  --primary-foreground: #FFFFFF;
+
+  --secondary: #1e293b;
+  --secondary-foreground: var(--background-gray);
+
+  --muted: #1e293b;
+  --muted-foreground: rgba(248, 250, 252, 0.6);
+
+  --accent: rgba(248, 250, 252, 0.1);
+  --accent-foreground: var(--background-gray);
+
+  --success: var(--accent-green);
+
+  --destructive: var(--danger-red);
+  --destructive-foreground: #FFFFFF;
+
+  --border: rgba(248, 250, 252, 0.15);
+  --input: rgba(248, 250, 252, 0.15);
+  --ring: var(--primary-blue);
+
+  --sidebar: var(--secondary-slate);
+  --sidebar-foreground: var(--background-gray);
+  --sidebar-primary: var(--primary-blue);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: var(--secondary-slate);
+  --sidebar-accent-foreground: var(--background-gray);
+  --sidebar-border: rgba(248, 250, 252, 0.1);
+  --sidebar-ring: var(--primary-blue);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
