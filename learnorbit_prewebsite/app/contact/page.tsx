@@ -32,7 +32,7 @@ export default function Contact() {
                                 </div>
                                 <h3 className="font-semibold text-slate-900 mb-2">Email Support</h3>
                                 <p className="text-sm text-slate-500">
-                                    support@learnorbit.com
+                                    devcontact09@gmail.com
                                 </p>
                             </CardContent>
                         </Card>
