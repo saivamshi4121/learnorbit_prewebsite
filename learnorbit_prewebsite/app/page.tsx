@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight, Users, Zap, Globe, BarChart3, PlayCircle, CheckCircle2, Trophy, Rocket, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EarlyAccessSlideIn } from "@/components/EarlyAccessSlideIn";
 
 // --- Mockup Components (Instructor & Student) ---
 
@@ -337,6 +338,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <EarlyAccessSlideIn />
 
       {/* Inline styles for marquee animation */}
       <style jsx>{`
