@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowRight, Users, Zap, Globe, BarChart3, PlayCircle, CheckCircle2, Trophy, Rocket, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EarlyAccessSlideIn } from "@/components/EarlyAccessSlideIn";
+import { LogoScroll } from "@/components/LogoScroll";
 
 // --- Mockup Components (Instructor & Student) ---
 
@@ -205,6 +206,9 @@ export default function Home() {
           ))}
         </div>
       </div>
+
+      {/* TRUSTED BY: Company Logos Horizontal Scroll */}
+      <LogoScroll />
 
       {/* CHOOSE YOUR TRAJECTORY (INTERACTIVE SHOWCASE) */}
       <section className="py-24 bg-slate-50 relative overflow-hidden">
