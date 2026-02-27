@@ -4,11 +4,11 @@ import React from "react";
 import Image from "next/image";
 
 // ── Real company logos ────────────────────────────────────────────────────────
-// Add more entries here as new partners join.
-// imgHeight: visual height in px — tune per logo to compensate for internal whitespace
+// scale: multiplier to adjust individual logo sizes perfectly to match visual weight.
 const logos = [
-  { name: "Vantixio", src: "/assets/vantixio.jpg", imgHeight: "110px", maxWidth: "280px" },
-  { name: "ShyvnTech", src: "/assets/shyvntech_logo.jpg", imgHeight: "72px", maxWidth: "200px" },
+  { name: "Vantixio", src: "/assets/vantixio.jpg", scale: 1 },
+  { name: "ShyvnTech", src: "/assets/shyvntech_logo.jpg", scale: 0.9 },
+  { name: "FreshGrade Prep", src: "/assets/freshgradeprep.png", scale: 1.35 },
 ];
 
 // Repeat 8× so the strip looks full and the loop is seamless
@@ -19,10 +19,8 @@ export const LogoScroll: React.FC = () => {
   return (
     <section
       style={{
-        background: "#ffffff",
-        padding: "52px 0 48px",
-        borderTop: "1px solid #e2e8f0",
-        borderBottom: "1px solid #e2e8f0",
+        background: "linear-gradient(to bottom, #ffffff, #f8fafc)",
+        padding: "64px 0 64px",
         overflow: "hidden",
       }}
     >
@@ -33,11 +31,11 @@ export const LogoScroll: React.FC = () => {
             display: "inline-flex",
             alignItems: "center",
             gap: "14px",
-            fontSize: "11px",
-            fontWeight: 700,
-            letterSpacing: "0.2em",
+            fontSize: "12px",
+            fontWeight: 600,
+            letterSpacing: "0.15em",
             textTransform: "uppercase",
-            color: "#94a3b8",
+            color: "#64748b",
           }}
         >
           <span style={{ display: "block", width: "48px", height: "1px", background: "#cbd5e1" }} />
@@ -68,7 +66,7 @@ export const LogoScroll: React.FC = () => {
                   width={300}
                   height={120}
                   className="lo-logo-img"
-                  style={{ width: "auto", height: logo.imgHeight, maxWidth: logo.maxWidth, objectFit: "contain" }}
+                  style={{ width: "auto", height: `${52 * (logo.scale || 1)}px`, maxWidth: "240px", objectFit: "contain" }}
                   priority={i < 4}
                 />
               </div>
@@ -81,7 +79,7 @@ export const LogoScroll: React.FC = () => {
           style={{
             position: "absolute", top: 0, right: 0, bottom: 0,
             width: "140px", zIndex: 10, pointerEvents: "none",
-            background: "linear-gradient(to left, #ffffff, transparent)",
+            background: "linear-gradient(to left, #f8fafc, transparent)",
           }}
         />
       </div>
@@ -102,18 +100,20 @@ export const LogoScroll: React.FC = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 0 56px;
-          border-right: 1px solid #f1f5f9;
+          padding: 0 48px;
         }
 
         .lo-logo-img {
           display: block;
           object-fit: contain;
-          transition: transform 0.3s ease, opacity 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          filter: grayscale(10%) drop-shadow(0px 1px 2px rgba(0,0,0,0.03));
+          opacity: 0.9;
         }
 
         .lo-logo-item:hover .lo-logo-img {
-          transform: scale(1.06) translateY(-2px);
+          transform: scale(1.04) translateY(-1px);
+          filter: grayscale(0%) drop-shadow(0px 6px 16px rgba(0,0,0,0.08));
           opacity: 1;
         }
 

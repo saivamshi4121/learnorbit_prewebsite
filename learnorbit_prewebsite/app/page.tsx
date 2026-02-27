@@ -130,10 +130,26 @@ const StudentCockpit = () => (
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'instructor' | 'student'>('instructor');
   const [mounted, setMounted] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const { currentTarget, clientX, clientY } = e;
+    const { top, left, width, height } = currentTarget.getBoundingClientRect();
+
+    // Calculate precise mouse coordinates within the hero container
+    const x = clientX - left;
+    const y = clientY - top;
+
+    // Normalizing values from -1 to 1 for 3D tilt calculation
+    const normalizedX = (x / width) * 2 - 1;
+    const normalizedY = (y / height) * 2 - 1;
+
+    setMousePosition({ x, y, normalizedX, normalizedY });
+  };
 
   // Simulated Ticker Items
   const tickerItems = [
@@ -150,7 +166,18 @@ export default function Home() {
     <div className="min-h-screen bg-slate-50 text-slate-900 overflow-x-hidden font-sans selection:bg-primary selection:text-white">
 
       {/* HERO SECTION */}
-      <section className="relative pt-32 pb-40 overflow-hidden bg-[#0F172A] text-white selection:bg-yellow-400 selection:text-black">
+      <section
+        className="relative pt-32 pb-40 overflow-hidden bg-[#0F172A] text-white selection:bg-yellow-400 selection:text-black"
+        onMouseMove={handleMouseMove}
+      >
+        {/* Dynamic Cursor Spotlight (The Game-Changer) */}
+        <div
+          className="pointer-events-none absolute -inset-px transition-opacity duration-300 opacity-100 z-10"
+          style={{
+            background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.15), transparent 40%)`
+          }}
+        />
+
         {/* Background Grid & gradient */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none" />
         <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -180,17 +207,33 @@ export default function Home() {
             </Button>
           </div>
 
-          {/* HERO MOCKUP: 3D Perspective */}
-          <div className="relative mx-auto max-w-5xl mt-12 perspective-[2000px] group animate-in fade-in zoom-in duration-1000 delay-500">
-            <div className="relative rounded-xl bg-slate-900 border border-slate-700 shadow-2xl transform rotate-x-12 translate-y-12 opacity-90 scale-95 border-t-white/20 group-hover:translate-y-8 group-hover:rotate-x-6 transition-all duration-1000 ease-out">
-              {/* Reflection overlay */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent pointer-events-none z-20 rounded-xl mix-blend-overlay" />
+          {/* HERO MOCKUP: 3D Perspective + Interactive Tilt */}
+          <div className="relative mx-auto max-w-5xl mt-12 perspective-[2000px] group animate-in fade-in zoom-in duration-1000 delay-500 z-20">
+            <div
+              className="relative rounded-xl bg-slate-900 border border-slate-700 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] transform-gpu opacity-90 scale-95 border-t-white/20 transition-all duration-300 ease-out"
+              style={{
+                transform: `rotateX(${12 - (mousePosition.normalizedY || 0) * 8}deg) rotateY(${(mousePosition.normalizedX || 0) * 10}deg) translateY(2rem)`
+              }}
+            >
+              {/* Reflection overlay tracking mouse cursor */}
+              <div
+                className="absolute inset-0 rounded-xl pointer-events-none z-20 mix-blend-overlay transition-opacity duration-300"
+                style={{
+                  background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(255, 255, 255, 0.2), transparent 40%)`
+                }}
+              />
               <div className="aspect-[16/9] w-full bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center text-slate-700 font-mono text-sm relative select-none">
                 <InstructorDashboard />
               </div>
             </div>
-            {/* Glow underneath */}
-            <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[80%] h-32 bg-primary/20 blur-[80px] transition-all duration-1000 opacity-60 group-hover:opacity-100 rounded-full -z-10 group-hover:w-[90%]" />
+            {/* Glow underneath reacting to tilt */}
+            <div
+              className="absolute -bottom-20 left-1/2 -translate-x-1/2 h-32 bg-primary/30 blur-[80px] transition-all duration-500 rounded-full -z-10"
+              style={{
+                width: '80%',
+                transform: `translate(${(mousePosition.normalizedX || 0) * -20}px, ${(mousePosition.normalizedY || 0) * -10}px)`
+              }}
+            />
           </div>
         </div>
       </section>
@@ -345,7 +388,7 @@ export default function Home() {
 
       <EarlyAccessSlideIn />
 
-      {/* Inline styles for marquee animation */}
+      {/* Inline styles for custom animations */}
       <style jsx>{`
                 @keyframes marquee {
                     0% { transform: translateX(0); }
@@ -354,17 +397,19 @@ export default function Home() {
                 .animate-marquee {
                     animation: marquee 40s linear infinite;
                 }
+                @keyframes gradient-x {
+                    0%, 100% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                }
+                .animate-gradient-x {
+                    animation: gradient-x 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+                    background-size: 200% 200%;
+                }
                 .perspective-[2000px] {
                     perspective: 2000px;
                 }
                 .perspective-[1000px] {
                     perspective: 1000px;
-                }
-                .rotate-x-12 {
-                    transform: rotateX(12deg);
-                }
-                .rotate-x-6 {
-                    transform: rotateX(6deg);
                 }
                 .no-scrollbar::-webkit-scrollbar {
                     display: none;
