@@ -130,7 +130,7 @@ const StudentCockpit = () => (
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'instructor' | 'student'>('instructor');
   const [mounted, setMounted] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0, normalizedX: 0, normalizedY: 0 });
 
   useEffect(() => {
     setMounted(true);
