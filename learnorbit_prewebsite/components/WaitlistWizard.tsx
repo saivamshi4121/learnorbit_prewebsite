@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { LoadingOverlay } from "./LoadingOverlay";
 import { Input } from "@/components/ui/input";
 import {
     User, GraduationCap, Presentation, Building, Briefcase,
@@ -96,6 +97,13 @@ export default function WaitlistWizard() {
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [submittedEmail, setSubmittedEmail] = useState("");
+    const [isSubmittingForm, setIsSubmittingForm] = useState(false);
+
+    useEffect(() => {
+        // Warmup ping to backend to reduce cold start delay on Render
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://learnorbit-backend.onrender.com";
+        fetch(`${apiUrl}/health`).catch(() => { });
+    }, []);
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -186,7 +194,7 @@ export default function WaitlistWizard() {
     };
 
     const handleSubmit = async () => {
-        setLoading(true);
+        setIsSubmittingForm(true);
         setError(null);
 
         try {
@@ -230,12 +238,14 @@ export default function WaitlistWizard() {
                 setError("Something went wrong. Please check your connection and try again.");
             }
         } finally {
-            setLoading(false);
+            setIsSubmittingForm(false);
         }
     };
 
     return (
         <div className="w-full max-w-2xl mx-auto bg-[#F8FAFC] rounded-2xl shadow-2xl overflow-hidden border border-slate-200 text-slate-900 flex flex-col min-h-[450px] md:min-h-[500px]">
+            <LoadingOverlay isVisible={isSubmittingForm} />
+
             {/* Progress Bar */}
             <div className="h-1.5 bg-slate-100 w-full">
                 <div
@@ -489,9 +499,14 @@ export default function WaitlistWizard() {
                 <div className="mt-8 pt-6 border-t border-slate-200 flex flex-col gap-4 justify-end">
                     {/* Error Message */}
                     {error && (
-                        <div className="p-3 bg-red-50 text-red-600 rounded-lg flex items-center gap-2 border border-red-200 text-sm animate-in fade-in slide-in-from-bottom-2">
-                            <AlertCircle className="w-4 h-4 shrink-0" />
-                            <span>{error}</span>
+                        <div className="p-3 bg-red-50 text-red-600 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-red-200 text-sm animate-in fade-in slide-in-from-bottom-2 w-full">
+                            <div className="flex items-center gap-2">
+                                <AlertCircle className="w-4 h-4 shrink-0" />
+                                <span>{error}</span>
+                            </div>
+                            <Button size="sm" variant="outline" className="h-8 border-red-200 text-red-600 hover:bg-red-50 whitespace-nowrap shrink-0" onClick={handleSubmit}>
+                                Try Again
+                            </Button>
                         </div>
                     )}
                     <div className="flex justify-end">
@@ -509,9 +524,9 @@ export default function WaitlistWizard() {
                                 onClick={handleSubmit}
                                 size="lg"
                                 className="w-full md:w-auto px-8 rounded-full font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/30"
-                                disabled={loading || !validateStep(step)}
+                                disabled={isSubmittingForm || !validateStep(step)}
                             >
-                                {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Rocket className="w-5 h-5 mr-2" />}
+                                {isSubmittingForm ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Rocket className="w-5 h-5 mr-2" />}
                                 Launch Waitlist
                             </Button>
                         )}
